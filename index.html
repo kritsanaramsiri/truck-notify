@@ -543,14 +543,14 @@ function genStep3() {
   out.appendChild(note);
 
   const isFlat = truckType==='flat';
-  const truckLine=`\n🚗 ทะเบียน: ${plate}\n👤 คนขับ: ${driver}\n📞 ${phone}`;
+  const truckLine=`\n ทะเบียน: ${plate}\n คนขับ: ${driver}\n ${phone}`;
 
   pickupsData.forEach(p=>{
     const pw=[];
     if(!isFlat){if(p.mom>0) pw.push(`พ่วงแม่ ${p.mom} ตัน`); if(p.kid>0) pw.push(`พ่วงลูก ${p.kid} ตัน`);}
     const lines=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.name}`,`📦 ${p.goods}`];
-    if(isFlat&&p.flatW>0) lines.push(`⚖️ ${p.flatW} ตัน`);
-    else if(pw.length) lines.push(`⚖️ ${pw.join(' / ')}`);
+    if(isFlat&&p.flatW>0) lines.push(` ${p.flatW} ตัน`);
+    else if(pw.length) lines.push(` ${pw.join(' / ')}`);
     if(p.link) lines.push(`🔗 ${p.link}`);
     lines.push(truckLine);
     addCard(out, p.name, lines.join('\n'));
@@ -559,8 +559,8 @@ function genStep3() {
       const mw=[];
       if(!isFlat){if(p.mmom>0) mw.push(`พ่วงแม่ ${p.mmom} ตัน`); if(p.mkid>0) mw.push(`พ่วงลูก ${p.mkid} ตัน`);}
       const ml=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.mname}`,`📦 ${p.mgoods}`];
-      if(isFlat&&p.mflatW>0) ml.push(`⚖️ ${p.mflatW} ตัน`);
-      else if(mw.length) ml.push(`⚖️ ${mw.join(' / ')}`);
+      if(isFlat&&p.mflatW>0) ml.push(` ${p.mflatW} ตัน`);
+      else if(mw.length) ml.push(` ${mw.join(' / ')}`);
       if(p.mnote) ml.push(`📝 ${p.mnote}`);
       ml.push(`🔗 ${p.link||'(รับที่เดียวกับ '+p.name+')'}`);
       ml.push(truckLine);
