@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แจ้งงานรถบรรทุก</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1117; --surface:#161b27; --card:#1e2436; --border:#2a3050;
+  --accent:#f5a623; --accent2:#4ecdc4; --green:#56cf7a;
+  --danger:#ff6b6b; --text:#dde3f8; --muted:#6b7499; --purple:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 48px;}
+.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;text-align:center;}
+.top-bar h1{font-size:1.15rem;font-weight:800;color:var(--accent);}
+.top-bar p{font-size:0.76rem;color:var(--muted);margin-top:2px;}
+
+/* TRUCK TYPE TOGGLE */
+.truck-toggle{display:flex;padding:12px 16px;gap:8px;background:var(--surface);border-bottom:1px solid var(--border);}
+.tt-btn{flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid var(--border);background:none;
+  color:var(--muted);font-family:'Sarabun',sans-serif;font-size:0.82rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.4;}
+.tt-btn.active{background:var(--accent);color:#0d1117;border-color:var(--accent);}
+.tt-btn.active.flat{background:var(--purple);border-color:var(--purple);}
+
+.steps-bar{display:flex;padding:10px 16px;gap:6px;background:var(--surface);border-bottom:1px solid var(--border);}
+.step-dot{flex:1;text-align:center;padding:8px 4px;border-radius:8px;font-size:0.68rem;font-weight:700;
+  color:var(--muted);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;line-height:1.4;}
+.step-dot.active{background:var(--accent);color:#0d1117;border-color:var(--accent);}
+.step-dot.done{border-color:var(--green);color:var(--green);}
+
+.page{display:none;padding:16px;}
+.page.active{display:block;}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+.sec-title{font-size:0.7rem;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+label{display:block;font-size:0.78rem;color:var(--muted);margin-bottom:4px;font-weight:500;}
+input,textarea,select{
+  width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Sarabun',sans-serif;font-size:0.9rem;
+  padding:10px 12px;outline:none;transition:border-color 0.2s;margin-bottom:10px;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:52px;}
+select option{background:var(--card);}
+
+.pickup-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative;}
+.pickup-num{font-size:0.7rem;font-weight:700;color:var(--accent2);letter-spacing:1px;margin-bottom:10px;}
+.remove-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--danger);
+  color:var(--danger);border-radius:6px;padding:2px 8px;font-size:0.72rem;cursor:pointer;}
+
+.weight-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.weight-row input{margin-bottom:0;}
+.weight-hint{font-size:0.67rem;color:var(--muted);margin-top:2px;}
+
+.maturn-toggle{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:0.82rem;color:var(--accent2);}
+.maturn-toggle input[type=checkbox]{width:auto;margin:0;accent-color:var(--accent2);}
+.maturn-area{display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:4px;}
+.maturn-area.show{display:block;}
+.sub-tag{font-size:0.7rem;color:var(--muted);margin-bottom:8px;}
+
+.add-btn{width:100%;background:none;border:1px dashed var(--border);color:var(--accent2);
+  border-radius:8px;padding:10px;font-size:0.85rem;cursor:pointer;font-family:'Sarabun',sans-serif;
+  transition:border-color 0.2s;margin-bottom:4px;}
+.add-btn:hover{border-color:var(--accent2);}
+
+.btn-primary{width:100%;background:var(--accent);color:#0d1117;border:none;border-radius:10px;
+  padding:14px;font-size:1rem;font-weight:800;font-family:'Sarabun',sans-serif;
+  cursor:pointer;letter-spacing:0.5px;transition:opacity 0.2s;margin-top:4px;}
+.btn-primary:hover{opacity:0.88;}
+.btn-secondary{width:100%;background:none;color:var(--accent2);border:1px solid var(--accent2);
+  border-radius:10px;padding:12px;font-size:0.9rem;font-weight:700;
+  font-family:'Sarabun',sans-serif;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.btn-secondary:hover{background:var(--accent2);color:#0d1117;}
+.btn-new{width:100%;background:var(--green);color:#0d1117;border:none;border-radius:10px;
+  padding:14px;font-size:1rem;font-weight:800;font-family:'Sarabun',sans-serif;
+  cursor:pointer;letter-spacing:0.5px;margin-top:8px;transition:opacity 0.2s;}
+.btn-new:hover{opacity:0.88;}
+
+/* RECOMMENDATION BOX */
+.rec-box{border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid;}
+.rec-box.trailer{background:#1a1f10;border-color:#56cf7a;}
+.rec-box.flat{background:#1a1227;border-color:#a78bfa;}
+.rec-title{font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;}
+.rec-box.trailer .rec-title{color:var(--green);}
+.rec-box.flat .rec-title{color:var(--purple);}
+.rec-row{display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;}
+.rec-label{color:var(--muted);}
+.rec-val{font-weight:700;color:var(--text);}
+.rec-divider{border:none;border-top:1px solid var(--border);margin:8px 0;}
+.loading-order{margin-top:8px;}
+.lo-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:0.8rem;}
+.lo-badge{min-width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:800;flex-shrink:0;}
+.lo-badge.bottom{background:#f5a623;color:#0d1117;}
+.lo-badge.top{background:#4ecdc4;color:#0d1117;}
+.lo-badge.mid{background:#a78bfa;color:#0d1117;}
+.lo-text{color:var(--text);line-height:1.4;}
+.lo-sub{font-size:0.72rem;color:var(--muted);}
+
+/* MSG CARDS */
+.msg-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.msg-header{background:var(--card);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+.msg-company{font-size:0.8rem;font-weight:700;color:var(--accent2);}
+.copy-btn{background:var(--accent);color:#0d1117;border:none;border-radius:6px;padding:5px 14px;
+  font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;transition:all 0.2s;}
+.copy-btn.copied{background:var(--green);}
+.msg-body{padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:0.78rem;line-height:1.75;white-space:pre-wrap;color:#c8d0f0;}
+
+.plate-input-big{width:100%;background:var(--card);border:2px solid var(--accent);border-radius:12px;
+  color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:1.3rem;font-weight:700;
+  text-align:center;padding:14px;outline:none;letter-spacing:2px;margin-bottom:12px;}
+
+.pickup-chip{background:var(--card);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:0.8rem;}
+.pickup-chip .pc-name{font-weight:700;color:var(--accent2);margin-bottom:2px;}
+.pickup-chip .pc-detail{color:var(--muted);font-size:0.76rem;}
+
+.success-note{background:var(--surface);border:1px solid var(--green);border-radius:10px;
+  padding:12px 16px;font-size:0.82rem;color:var(--green);text-align:center;margin-bottom:12px;}
+.warn-note{background:#2a1515;border:1px solid var(--danger);border-radius:8px;
+  padding:10px 14px;font-size:0.82rem;color:var(--danger);margin-bottom:10px;}
+.over{color:var(--danger)!important;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>🚛 ระบบแจ้งงานรถบรรทุก</h1>
+  <p>3 ขั้นตอน · แจ้งรถ → ได้ทะเบียน → แจ้งโรงเหล็ก</p>
+</div>
+
+<!-- ประเภทรถ -->
+<div class="truck-toggle">
+  <button class="tt-btn active" id="tt_trailer" onclick="setTruckType('trailer')">
+    🚛 รถพ่วง<br><span style="font-weight:400;font-size:0.72rem;">แม่ 13ต / ลูก 18ต</span>
+  </button>
+  <button class="tt-btn flat" id="tt_flat" onclick="setTruckType('flat')">
+    🚚 รถพื้นเรียบ<br><span style="font-weight:400;font-size:0.72rem;">บรรทุกรวม 32-33ต</span>
+  </button>
+</div>
+
+<div class="steps-bar">
+  <div class="step-dot active" id="tab1" onclick="goStep(1)"><div>ขั้นที่ 1</div><div>แจ้งกลุ่มรถ</div></div>
+  <div class="step-dot" id="tab2" onclick="goStep(2)"><div>ขั้นที่ 2</div><div>กรอกทะเบียน</div></div>
+  <div class="step-dot" id="tab3" onclick="goStep(3)"><div>ขั้นที่ 3</div><div>แจ้งโรงเหล็ก</div></div>
+</div>
+
+<!-- STEP 1 -->
+<div class="page active" id="page1">
+  <div class="section">
+    <div class="sec-title">วันที่รับของ</div>
+    <input type="text" id="pickup_date" placeholder="เช่น 15/5/69" style="margin-bottom:0">
+  </div>
+  <div class="section">
+    <div class="sec-title">จุดรับของ</div>
+    <div id="pickups"></div>
+    <button class="add-btn" onclick="addPickup()">+ เพิ่มจุดรับ</button>
+  </div>
+  <button class="btn-primary" onclick="genStep1()">📋 สร้างข้อความแจ้งกลุ่มรถบรรทุก</button>
+  <div id="step1_out" style="margin-top:16px;"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="page" id="page2">
+  <div class="section">
+    <div class="sec-title">กรอกข้อมูลทะเบียนที่ได้รับ</div>
+    <label>ทะเบียนรถ</label>
+    <input class="plate-input-big" type="text" id="truck_plate" placeholder="เช่น ลย70-1639">
+    <label>ชื่อคนขับ</label>
+    <input type="text" id="driver_name" placeholder="เช่น นายสุภลักษ์ ปิ่นปั้น">
+    <label>เบอร์โทรคนขับ</label>
+    <input type="text" id="driver_phone" placeholder="เช่น 0810603166" style="margin-bottom:0">
+  </div>
+  <div id="step2_summary" style="display:none" class="section">
+    <div class="sec-title">จุดรับที่ตั้งไว้</div>
+    <div id="step2_chips"></div>
+  </div>
+  <button class="btn-primary" onclick="genStep3()">✨ สร้างข้อความแยกแต่ละโรงเหล็ก</button>
+  <button class="btn-secondary" onclick="goStep(1)">← แก้ไขจุดรับ</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="page" id="page3">
+  <div id="step3_out"></div>
+  <button class="btn-secondary" onclick="goStep(2)">← แก้ไขทะเบียน</button>
+  <button class="btn-new" onclick="resetAll()">+ แจ้งงานใหม่</button>
+</div>
+
+<script>
+// ─── GOODS CATEGORIES ───
+// สินค้าที่ต้องใช้รถพื้นเรียบ (ยาว / หนัก / ต้องวางราบ)
+const FLAT_BED_GOODS = ['แป๊ป','เหล็กแผ่น','เหล็กม้วน','เหล็กรูปพรรณ','เหล็กข้ออ้อย','เหล็กเส้น','เหล็กโครงสร้าง','เหล็กแบน','ท่อเหล็ก','รางน้ำ','ไอบีม','เอชบีม','คานเหล็ก'];
+// สินค้าที่ควรวางล่างสุด (หนัก แข็ง ทนแรงกด)
+const HEAVY_GOODS = ['เหล็กเส้น','เหล็กข้ออ้อย','เหล็กแผ่น','เหล็กม้วน','แป๊ป','ท่อ','คาน','ไอบีม','เอชบีม','เหล็กโครงสร้าง','แป๊ปแบน'];
+// สินค้าที่ต้องวางบนสุด (บาง เสียหายง่าย)
+const TOP_GOODS = ['ซีลาย','แป','มุ้งลวด','แสลน','ฉาก','สแตนเลส','อลูมิเนียม','กระเบื้อง','เมทัลชีท','หลังคา','ตะแกรง'];
+
+let pickupCount = 0;
+let pickupsData = [];
+let truckType = 'trailer'; // 'trailer' | 'flat'
+
+function setTruckType(type) {
+  truckType = type;
+  document.getElementById('tt_trailer').classList.toggle('active', type==='trailer');
+  document.getElementById('tt_flat').classList.toggle('active', type==='flat');
+  // re-render weight fields
+  document.querySelectorAll('.pickup-block').forEach(b => {
+    const id = b.id.replace('pickup_','');
+    const wf = document.getElementById('wf_'+id);
+    if(wf) wf.style.display = type==='trailer' ? 'block' : 'none';
+    const wflat = document.getElementById('wflat_'+id);
+    if(wflat) wflat.style.display = type==='flat' ? 'block' : 'none';
+  });
+}
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('page'+i).classList.toggle('active', i===n);
+    const tab = document.getElementById('tab'+i);
+    tab.classList.remove('active','done');
+    if(i===n) tab.classList.add('active');
+    else if(i<n) tab.classList.add('done');
+  });
+  if(n===2) renderStep2Summary();
+  window.scrollTo(0,0);
+}
+
+function addPickup() {
+  pickupCount++;
+  const id = pickupCount;
+  const isFlat = truckType === 'flat';
+  const div = document.createElement('div');
+  div.className = 'pickup-block';
+  div.id = 'pickup_'+id;
+  div.innerHTML = `
+    <div class="pickup-num">จุดรับที่ ${id}</div>
+    ${id>1?`<button class="remove-btn" onclick="removePickup(${id})">ลบ</button>`:''}
+    <label>ชื่อบริษัท / โรงเหล็ก</label>
+    <input type="text" id="p${id}_name" placeholder="เช่น บจ.อินฟินิตี้ เมทัล">
+    <label>รายการสินค้า</label>
+    <textarea id="p${id}_goods" placeholder="เช่น แป๊ปแบน GI" rows="2"></textarea>
+
+    <div id="wf_${id}" style="display:${isFlat?'none':'block'}">
+      <div class="weight-row">
+        <div>
+          <label>ใส่พ่วงแม่ (ตัน)</label>
+          <input type="number" id="p${id}_mom" placeholder="0" step="0.01">
+          <div class="weight-hint">สูงสุด 13 ตัน</div>
+        </div>
+        <div>
+          <label>ใส่พ่วงลูก (ตัน)</label>
+          <input type="number" id="p${id}_kid" placeholder="0" step="0.01">
+          <div class="weight-hint">สูงสุด 18 ตัน</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="wflat_${id}" style="display:${isFlat?'block':'none'}">
+      <label>น้ำหนัก (ตัน)</label>
+      <input type="number" id="p${id}_flat" placeholder="0" step="0.01" style="margin-bottom:8px">
+    </div>
+
+    <label>ลิงก์พิกัด Google Maps</label>
+    <input type="text" id="p${id}_link" placeholder="https://maps.app.goo.gl/..." style="margin-bottom:10px">
+    <label class="maturn-toggle">
+      <input type="checkbox" id="p${id}_hm" onchange="toggleMaturn(${id})">
+      <span>+ มีมาเทิร์น (รับที่จุดเดียวกัน)</span>
+    </label>
+    <div class="maturn-area" id="ma_${id}">
+      <div class="sub-tag">— ข้อมูลมาเทิร์น —</div>
+      <label>ชื่อบริษัท</label>
+      <input type="text" id="p${id}_mname" placeholder="เช่น บจ.มหาโชค มหาชัย เทรดดิ้ง">
+      <label>รายการสินค้า</label>
+      <textarea id="p${id}_mgoods" placeholder="เช่น มุ้งลวดอลูมิเนียม/แสลน" rows="2"></textarea>
+      <div class="weight-row" id="mwf_${id}" style="display:${isFlat?'none':'grid'}">
+        <div>
+          <label>ใส่พ่วงแม่ (ตัน)</label>
+          <input type="number" id="p${id}_mmom" placeholder="0" step="0.01">
+        </div>
+        <div>
+          <label>ใส่พ่วงลูก (ตัน)</label>
+          <input type="number" id="p${id}_mkid" placeholder="0" step="0.01">
+        </div>
+      </div>
+      <div id="mwflat_${id}" style="display:${isFlat?'block':'none'}">
+        <label>น้ำหนัก (ตัน)</label>
+        <input type="number" id="p${id}_mflat" placeholder="0" step="0.01" style="margin-bottom:8px">
+      </div>
+      <label>หมายเหตุ</label>
+      <input type="text" id="p${id}_mnote" placeholder="เช่น วางบนสุด" style="margin-bottom:0">
+    </div>
+  `;
+  document.getElementById('pickups').appendChild(div);
+}
+
+function removePickup(id) { document.getElementById('pickup_'+id)?.remove(); }
+function toggleMaturn(id) {
+  document.getElementById('ma_'+id).classList.toggle('show', document.getElementById('p'+id+'_hm').checked);
+}
+
+function v(id){return(document.getElementById(id)?.value||'').trim();}
+function n(id){const x=parseFloat(v(id));return isNaN(x)?0:x;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function collectPickups() {
+  return Array.from(document.querySelectorAll('.pickup-block')).map(b => {
+    const id = b.id.replace('pickup_','');
+    const hm = document.getElementById('p'+id+'_hm')?.checked;
+    const isFlat = truckType==='flat';
+    return {
+      name:v('p'+id+'_name'), goods:v('p'+id+'_goods'),
+      mom:isFlat?0:n('p'+id+'_mom'), kid:isFlat?0:n('p'+id+'_kid'),
+      flatW:isFlat?n('p'+id+'_flat'):0,
+      link:v('p'+id+'_link'), hasMaturn:hm,
+      mname:hm?v('p'+id+'_mname'):'', mgoods:hm?v('p'+id+'_mgoods'):'',
+      mmom:hm&&!isFlat?n('p'+id+'_mmom'):0, mkid:hm&&!isFlat?n('p'+id+'_mkid'):0,
+      mflatW:hm&&isFlat?n('p'+id+'_mflat'):0,
+      mnote:hm?v('p'+id+'_mnote'):'',
+    };
+  }).filter(p=>p.name);
+}
+
+// ─── ANALYZE GOODS ───
+function goodsPriority(goods) {
+  const g = goods.toLowerCase();
+  if(TOP_GOODS.some(k=>g.includes(k.toLowerCase()))) return 'top';
+  if(HEAVY_GOODS.some(k=>g.includes(k.toLowerCase()))) return 'bottom';
+  return 'mid';
+}
+
+function needsFlatBed(goods) {
+  const g = goods.toLowerCase();
+  return FLAT_BED_GOODS.some(k=>g.includes(k.toLowerCase()));
+}
+
+function buildLoadingOrder(pickups) {
+  // flatten all items with priority
+  const items = [];
+  pickups.forEach((p,i) => {
+    const pri = goodsPriority(p.goods);
+    const w = truckType==='flat' ? p.flatW : (p.mom+p.kid);
+    items.push({seq:i+1, name:p.name, goods:p.goods, w, pri, isMaturn:false});
+    if(p.hasMaturn && p.mname) {
+      const mp = goodsPriority(p.mgoods);
+      const mw = truckType==='flat' ? p.mflatW : (p.mmom+p.mkid);
+      items.push({seq:i+1, name:p.mname, goods:p.mgoods, w:mw, pri:mp, isMaturn:true, mnote:p.mnote});
+    }
+  });
+  // sort: bottom first, mid, top last
+  const order = ['bottom','mid','top'];
+  return items.sort((a,b)=>order.indexOf(a.pri)-order.indexOf(b.pri));
+}
+
+function buildPickupOrder(pickups) {
+  // Recommend pickup order based on loading (heavy = pick last so it's at bottom)
+  // Actually: heavy goods need to be LOADED first = picked up FIRST
+  // Light/top goods picked up LAST
+  const scored = pickups.map((p,i) => {
+    const pri = goodsPriority(p.goods);
+    const score = pri==='bottom'?0:pri==='mid'?1:2;
+    return {orig:i, score};
+  });
+  return scored.sort((a,b)=>a.score-b.score).map(x=>x.orig);
+}
+
+function recommendTruckType(pickups) {
+  const allGoods = pickups.map(p=>p.goods+' '+(p.mgoods||'')).join(' ');
+  if(needsFlatBed(allGoods)) return 'flat';
+  return 'trailer';
+}
+
+// ─── STEP 1 ───
+function genStep1() {
+  const date = v('pickup_date');
+  if(!date){alert('กรุณากรอกวันที่รับของ');return;}
+  pickupsData = collectPickups();
+  if(!pickupsData.length){alert('กรุณาเพิ่มจุดรับอย่างน้อย 1 จุด');return;}
+
+  let tMom=0, tKid=0, tFlat=0;
+  pickupsData.forEach(p=>{tMom+=p.mom+p.mmom; tKid+=p.kid+p.mkid; tFlat+=p.flatW+p.mflatW;});
+
+  const recType = recommendTruckType(pickupsData);
+  const pickupOrder = buildPickupOrder(pickupsData);
+  const loadingOrder = buildLoadingOrder(pickupsData);
+  const isFlat = truckType==='flat';
+
+  // Build message
+  const lines = [`🚛 แจ้งงานรถ${isFlat?'พื้นเรียบ':'พ่วง'} วันที่ ${date}`, `รับของ ${pickupsData.length} จุด`, ''];
+
+  // Recommended pickup order
+  pickupOrder.forEach((origIdx, i) => {
+    const p = pickupsData[origIdx];
+    lines.push(`${i+1}. ${p.name}`);
+    lines.push(`   📦 ${p.goods}`);
+    if(isFlat) {
+      if(p.flatW>0) lines.push(`   ⚖️ ${p.flatW} ตัน`);
+    } else {
+      const pw=[];
+      if(p.mom>0) pw.push(`แม่ ${p.mom} ตัน`);
+      if(p.kid>0) pw.push(`ลูก ${p.kid} ตัน`);
+      if(pw.length) lines.push(`   ⚖️ ${pw.join(' / ')}`);
+    }
+    if(p.link) lines.push(`   📍 ${p.link}`);
+    if(p.hasMaturn && p.mname) {
+      lines.push(`   ──`);
+      lines.push(`   + มาเทิร์น: ${p.mname}`);
+      lines.push(`   📦 ${p.mgoods}`);
+      if(isFlat) {
+        if(p.mflatW>0) lines.push(`   ⚖️ ${p.mflatW} ตัน`);
+      } else {
+        const mw=[];
+        if(p.mmom>0) mw.push(`แม่ ${p.mmom} ตัน`);
+        if(p.mkid>0) mw.push(`ลูก ${p.mkid} ตัน`);
+        if(mw.length) lines.push(`   ⚖️ ${mw.join(' / ')}`);
+      }
+      if(p.mnote) lines.push(`   📝 ${p.mnote}`);
+    }
+    lines.push('');
+  });
+
+  if(isFlat) {
+    lines.push(`⚖️ น้ำหนักรวม: ${tFlat.toFixed(2)} ตัน`);
+  } else {
+    const momOver=tMom>13, kidOver=tKid>18;
+    lines.push(`⚖️ รวมทั้งคัน`);
+    lines.push(`   พ่วงแม่: ${tMom.toFixed(2)} / 13 ตัน${momOver?' ⚠️':''}`);
+    lines.push(`   พ่วงลูก: ${tKid.toFixed(2)} / 18 ตัน${kidOver?' ⚠️':''}`);
+    lines.push(`   รวม: ${(tMom+tKid).toFixed(2)} ตัน`);
+  }
+
+  const msg = lines.join('\n');
+  const out = document.getElementById('step1_out');
+  out.innerHTML = '';
+
+  // RECOMMENDATION BOX
+  const recBox = document.createElement('div');
+  recBox.className = 'rec-box ' + (recType==='flat'?'flat':'trailer');
+  let recHtml = `<div class="rec-title">${recType==='flat'?'🚚 แนะนำ: ใช้รถพื้นเรียบ':'🚛 แนะนำ: ใช้รถพ่วงเทรลเลอร์'}</div>`;
+
+  // Pickup order section
+  recHtml += `<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;font-weight:700;letter-spacing:0.5px;">ลำดับรับของที่แนะนำ</div>`;
+  pickupOrder.forEach((origIdx, i) => {
+    const p = pickupsData[origIdx];
+    const w = isFlat ? p.flatW : (p.mom+p.kid);
+    recHtml += `<div class="rec-row"><span class="rec-label">${i+1}. ${p.name}</span><span class="rec-val">${w>0?w+' ตัน':'-'}</span></div>`;
+  });
+
+  // Loading order
+  recHtml += `<hr class="rec-divider"><div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;font-weight:700;letter-spacing:0.5px;">ลำดับวางของบนรถ (ล่าง → บน)</div>`;
+  recHtml += `<div class="loading-order">`;
+  loadingOrder.forEach((item, i) => {
+    const badge = item.pri==='bottom'?'bottom':item.pri==='top'?'top':'mid';
+    const label = item.pri==='bottom'?'ล่าง':item.pri==='top'?'บน':'กลาง';
+    recHtml += `<div class="lo-item">
+      <div class="lo-badge ${badge}">${label}</div>
+      <div class="lo-text">${item.name}<br><span class="lo-sub">${item.goods}${item.w>0?' ('+item.w+' ตัน)':''}</span></div>
+    </div>`;
+  });
+  recHtml += '</div>';
+
+  if(recType!==truckType) {
+    recHtml += `<div style="margin-top:8px;font-size:0.78rem;color:var(--danger);">⚠️ สินค้านี้ควรใช้รถ${recType==='flat'?'พื้นเรียบ':'พ่วง'} กรุณาตรวจสอบประเภทรถด้านบน</div>`;
+  }
+
+  recBox.innerHTML = recHtml;
+  out.appendChild(recBox);
+
+  // Warning
+  if(!isFlat && (tMom>13||tKid>18)) {
+    const w=document.createElement('div'); w.className='warn-note';
+    w.textContent='⚠️ น้ำหนักเกินกำหนด กรุณาตรวจสอบก่อนส่ง'; out.appendChild(w);
+  }
+  if(isFlat && tFlat>33) {
+    const w=document.createElement('div'); w.className='warn-note';
+    w.textContent='⚠️ น้ำหนักรวมเกิน 33 ตัน กรุณาตรวจสอบก่อนส่ง'; out.appendChild(w);
+  }
+
+  addCard(out, '📢 ส่งกลุ่มรถบรรทุก', msg);
+
+  const nb=document.createElement('button'); nb.className='btn-primary'; nb.style.marginTop='8px';
+  nb.textContent='✅ ได้ทะเบียนแล้ว → ไปขั้นที่ 2'; nb.onclick=()=>goStep(2);
+  out.appendChild(nb);
+}
+
+// ─── STEP 2 SUMMARY ───
+function renderStep2Summary() {
+  pickupsData = collectPickups();
+  const sum=document.getElementById('step2_summary');
+  const chips=document.getElementById('step2_chips');
+  if(!pickupsData.length){sum.style.display='none';return;}
+  sum.style.display='block'; chips.innerHTML='';
+  const isFlat=truckType==='flat';
+  pickupsData.forEach((p,i)=>{
+    const w = isFlat ? p.flatW : (p.mom+p.kid);
+    const c=document.createElement('div'); c.className='pickup-chip';
+    c.innerHTML=`<div class="pc-name">${i+1}. ${esc(p.name)}</div>
+      <div class="pc-detail">${esc(p.goods)} · ${w>0?w+' ตัน':'-'}</div>
+      ${p.hasMaturn&&p.mname?`<div class="pc-detail" style="color:var(--accent2)">+ มาเทิร์น: ${esc(p.mname)}</div>`:''}`;
+    chips.appendChild(c);
+  });
+}
+
+// ─── STEP 3 ───
+function genStep3() {
+  const plate=v('truck_plate'), driver=v('driver_name'), phone=v('driver_phone'), date=v('pickup_date');
+  if(!plate||!driver||!phone){alert('กรุณากรอกทะเบียน ชื่อคนขับ และเบอร์โทรให้ครบ');return;}
+  pickupsData=collectPickups();
+  if(!pickupsData.length){alert('ไม่พบข้อมูลจุดรับ กรุณากลับไปกรอกขั้นที่ 1');return;}
+
+  goStep(3);
+  const out=document.getElementById('step3_out');
+  out.innerHTML='';
+
+  const note=document.createElement('div'); note.className='success-note';
+  note.textContent='✅ คัดลอกแต่ละข้อความส่งกลุ่มโรงเหล็กแยกกันได้เลยครับ';
+  out.appendChild(note);
+
+  const isFlat = truckType==='flat';
+  const truckLine=`\n🚗 ทะเบียน: ${plate}\n👤 คนขับ: ${driver}\n📞 ${phone}`;
+
+  pickupsData.forEach(p=>{
+    const pw=[];
+    if(!isFlat){if(p.mom>0) pw.push(`พ่วงแม่ ${p.mom} ตัน`); if(p.kid>0) pw.push(`พ่วงลูก ${p.kid} ตัน`);}
+    const lines=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.name}`,`📦 ${p.goods}`];
+    if(isFlat&&p.flatW>0) lines.push(`⚖️ ${p.flatW} ตัน`);
+    else if(pw.length) lines.push(`⚖️ ${pw.join(' / ')}`);
+    if(p.link) lines.push(`🔗 ${p.link}`);
+    lines.push(truckLine);
+    addCard(out, p.name, lines.join('\n'));
+
+    if(p.hasMaturn&&p.mname){
+      const mw=[];
+      if(!isFlat){if(p.mmom>0) mw.push(`พ่วงแม่ ${p.mmom} ตัน`); if(p.mkid>0) mw.push(`พ่วงลูก ${p.mkid} ตัน`);}
+      const ml=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.mname}`,`📦 ${p.mgoods}`];
+      if(isFlat&&p.mflatW>0) ml.push(`⚖️ ${p.mflatW} ตัน`);
+      else if(mw.length) ml.push(`⚖️ ${mw.join(' / ')}`);
+      if(p.mnote) ml.push(`📝 ${p.mnote}`);
+      ml.push(`🔗 ${p.link||'(รับที่เดียวกับ '+p.name+')'}`);
+      ml.push(truckLine);
+      addCard(out, p.mname+' (มาเทิร์น)', ml.join('\n'));
+    }
+  });
+}
+
+function addCard(container, label, text) {
+  const card=document.createElement('div'); card.className='msg-card';
+  const btn=document.createElement('button'); btn.className='copy-btn'; btn.textContent='คัดลอก';
+  btn.onclick=()=>{navigator.clipboard.writeText(text).then(()=>{btn.textContent='✓ คัดลอกแล้ว';btn.classList.add('copied');setTimeout(()=>{btn.textContent='คัดลอก';btn.classList.remove('copied');},2000);});};
+  const header=document.createElement('div'); header.className='msg-header';
+  const lbl=document.createElement('span'); lbl.className='msg-company'; lbl.textContent=label;
+  header.appendChild(lbl); header.appendChild(btn);
+  const body=document.createElement('div'); body.className='msg-body'; body.textContent=text;
+  card.appendChild(header); card.appendChild(body);
+  container.appendChild(card);
+}
+
+function resetAll() {
+  if(!confirm('ล้างข้อมูลทั้งหมดและเริ่มงานใหม่?')) return;
+  document.getElementById('pickup_date').value='';
+  document.getElementById('truck_plate').value='';
+  document.getElementById('driver_name').value='';
+  document.getElementById('driver_phone').value='';
+  document.getElementById('pickups').innerHTML='';
+  pickupCount=0; pickupsData=[];
+  addPickup();
+  document.getElementById('step1_out').innerHTML='';
+  document.getElementById('step3_out').innerHTML='';
+  goStep(1);
+}
+
+addPickup();
+</script>
+</body>
+</html>
