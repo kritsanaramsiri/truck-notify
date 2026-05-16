@@ -418,12 +418,12 @@ function genStep1() {
     lines.push(`${i+1}. ${p.name}`);
     lines.push(`   📦 ${p.goods}`);
     if(isFlat) {
-      if(p.flatW>0) lines.push(`    ${p.flatW} ตัน`);
+      if(p.flatW>0) lines.push(`   ⚖️ ${p.flatW} ตัน`);
     } else {
       const pw=[];
       if(p.mom>0) pw.push(`แม่ ${p.mom} ตัน`);
       if(p.kid>0) pw.push(`ลูก ${p.kid} ตัน`);
-      if(pw.length) lines.push(`    ${pw.join(' / ')}`);
+      if(pw.length) lines.push(`   ⚖️ ${pw.join(' / ')}`);
     }
     if(p.link) lines.push(`   📍 ${p.link}`);
     if(p.hasMaturn && p.mname) {
@@ -431,12 +431,12 @@ function genStep1() {
       lines.push(`   + มาเทิร์น: ${p.mname}`);
       lines.push(`   📦 ${p.mgoods}`);
       if(isFlat) {
-        if(p.mflatW>0) lines.push(`    ${p.mflatW} ตัน`);
+        if(p.mflatW>0) lines.push(`   ⚖️ ${p.mflatW} ตัน`);
       } else {
         const mw=[];
         if(p.mmom>0) mw.push(`แม่ ${p.mmom} ตัน`);
         if(p.mkid>0) mw.push(`ลูก ${p.mkid} ตัน`);
-        if(mw.length) lines.push(`    ${mw.join(' / ')}`);
+        if(mw.length) lines.push(`   ⚖️ ${mw.join(' / ')}`);
       }
       if(p.mnote) lines.push(`   📝 ${p.mnote}`);
     }
@@ -444,12 +444,12 @@ function genStep1() {
   });
 
   if(isFlat) {
-    lines.push(` น้ำหนักรวม: ${tFlat.toFixed(2)} ตัน`);
+    lines.push(`⚖️ น้ำหนักรวม: ${tFlat.toFixed(2)} ตัน`);
   } else {
     const momOver=tMom>13, kidOver=tKid>18;
-    lines.push(` รวมทั้งคัน`);
-    lines.push(`   พ่วงแม่: ${tMom.toFixed(2)} / 13 ตัน${momOver?' ⚠️':''}`);
-    lines.push(`   พ่วงลูก: ${tKid.toFixed(2)} / 18 ตัน${kidOver?' ⚠️':''}`);
+    lines.push(`⚖️ รวมทั้งคัน`);
+    lines.push(`   ใส่แม่: ${tMom.toFixed(2)} / 13 ตัน${momOver?' ⚠️':''}`);
+    lines.push(`   ใส่ลูก: ${tKid.toFixed(2)} / 18 ตัน${kidOver?' ⚠️':''}`);
     lines.push(`   รวม: ${(tMom+tKid).toFixed(2)} ตัน`);
   }
 
@@ -543,24 +543,24 @@ function genStep3() {
   out.appendChild(note);
 
   const isFlat = truckType==='flat';
-  const truckLine=`\n ทะเบียน: ${plate}\n คนขับ: ${driver}\n ${phone}`;
+  const truckLine=`\n🚗 ทะเบียน: ${plate}\n👤 คนขับ: ${driver}\n📞 ${phone}`;
 
   pickupsData.forEach(p=>{
     const pw=[];
-    if(!isFlat){if(p.mom>0) pw.push(`พ่วงแม่ ${p.mom} ตัน`); if(p.kid>0) pw.push(`พ่วงลูก ${p.kid} ตัน`);}
+    if(!isFlat){if(p.mom>0) pw.push(`ใส่แม่ ${p.mom} ตัน`); if(p.kid>0) pw.push(`ใส่ลูก ${p.kid} ตัน`);}
     const lines=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.name}`,`📦 ${p.goods}`];
-    if(isFlat&&p.flatW>0) lines.push(` ${p.flatW} ตัน`);
-    else if(pw.length) lines.push(` ${pw.join(' / ')}`);
+    if(isFlat&&p.flatW>0) lines.push(`⚖️ ${p.flatW} ตัน`);
+    else if(pw.length) lines.push(`⚖️ ${pw.join(' / ')}`);
     if(p.link) lines.push(`🔗 ${p.link}`);
     lines.push(truckLine);
     addCard(out, p.name, lines.join('\n'));
 
     if(p.hasMaturn&&p.mname){
       const mw=[];
-      if(!isFlat){if(p.mmom>0) mw.push(`พ่วงแม่ ${p.mmom} ตัน`); if(p.mkid>0) mw.push(`พ่วงลูก ${p.mkid} ตัน`);}
+      if(!isFlat){if(p.mmom>0) mw.push(`ใส่แม่ ${p.mmom} ตัน`); if(p.mkid>0) mw.push(`ใส่ลูก ${p.mkid} ตัน`);}
       const ml=[`🚛 แจ้งรถเข้ารับของ วันที่ ${date}`,'',`📍 ${p.mname}`,`📦 ${p.mgoods}`];
-      if(isFlat&&p.mflatW>0) ml.push(` ${p.mflatW} ตัน`);
-      else if(mw.length) ml.push(` ${mw.join(' / ')}`);
+      if(isFlat&&p.mflatW>0) ml.push(`⚖️ ${p.mflatW} ตัน`);
+      else if(mw.length) ml.push(`⚖️ ${mw.join(' / ')}`);
       if(p.mnote) ml.push(`📝 ${p.mnote}`);
       ml.push(`🔗 ${p.link||'(รับที่เดียวกับ '+p.name+')'}`);
       ml.push(truckLine);
