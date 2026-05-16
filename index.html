@@ -423,7 +423,7 @@ function genStep1() {
       const pw=[];
       if(p.mom>0) pw.push(`แม่ ${p.mom} ตัน`);
       if(p.kid>0) pw.push(`ลูก ${p.kid} ตัน`);
-      if(pw.length) lines.push(`   ⚖️ ${pw.join(' / ')}`);
+      if(pw.length) lines.push(`    ${pw.join(' / ')}`);
     }
     if(p.link) lines.push(`   📍 ${p.link}`);
     if(p.hasMaturn && p.mname) {
@@ -431,12 +431,12 @@ function genStep1() {
       lines.push(`   + มาเทิร์น: ${p.mname}`);
       lines.push(`   📦 ${p.mgoods}`);
       if(isFlat) {
-        if(p.mflatW>0) lines.push(`   ⚖️ ${p.mflatW} ตัน`);
+        if(p.mflatW>0) lines.push(`    ${p.mflatW} ตัน`);
       } else {
         const mw=[];
         if(p.mmom>0) mw.push(`แม่ ${p.mmom} ตัน`);
         if(p.mkid>0) mw.push(`ลูก ${p.mkid} ตัน`);
-        if(mw.length) lines.push(`   ⚖️ ${mw.join(' / ')}`);
+        if(mw.length) lines.push(`    ${mw.join(' / ')}`);
       }
       if(p.mnote) lines.push(`   📝 ${p.mnote}`);
     }
