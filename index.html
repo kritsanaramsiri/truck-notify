@@ -418,7 +418,7 @@ function genStep1() {
     lines.push(`${i+1}. ${p.name}`);
     lines.push(`   📦 ${p.goods}`);
     if(isFlat) {
-      if(p.flatW>0) lines.push(`   ⚖️ ${p.flatW} ตัน`);
+      if(p.flatW>0) lines.push(`    ${p.flatW} ตัน`);
     } else {
       const pw=[];
       if(p.mom>0) pw.push(`แม่ ${p.mom} ตัน`);
@@ -444,10 +444,10 @@ function genStep1() {
   });
 
   if(isFlat) {
-    lines.push(`⚖️ น้ำหนักรวม: ${tFlat.toFixed(2)} ตัน`);
+    lines.push(` น้ำหนักรวม: ${tFlat.toFixed(2)} ตัน`);
   } else {
     const momOver=tMom>13, kidOver=tKid>18;
-    lines.push(`⚖️ รวมทั้งคัน`);
+    lines.push(` รวมทั้งคัน`);
     lines.push(`   พ่วงแม่: ${tMom.toFixed(2)} / 13 ตัน${momOver?' ⚠️':''}`);
     lines.push(`   พ่วงลูก: ${tKid.toFixed(2)} / 18 ตัน${kidOver?' ⚠️':''}`);
     lines.push(`   รวม: ${(tMom+tKid).toFixed(2)} ตัน`);
