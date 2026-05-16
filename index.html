@@ -192,13 +192,32 @@ select option{background:var(--card);}
 </div>
 
 <script>
-// ─── GOODS CATEGORIES ───
-// สินค้าที่ต้องใช้รถพื้นเรียบ (ยาว / หนัก / ต้องวางราบ)
-const FLAT_BED_GOODS = ['แป๊ป','เหล็กแผ่น','เหล็กม้วน','เหล็กรูปพรรณ','เหล็กข้ออ้อย','เหล็กเส้น','เหล็กโครงสร้าง','เหล็กแบน','ท่อเหล็ก','รางน้ำ','ไอบีม','เอชบีม','คานเหล็ก'];
-// สินค้าที่ควรวางล่างสุด (หนัก แข็ง ทนแรงกด)
-const HEAVY_GOODS = ['เหล็กเส้น','เหล็กข้ออ้อย','เหล็กแผ่น','เหล็กม้วน','แป๊ป','ท่อ','คาน','ไอบีม','เอชบีม','เหล็กโครงสร้าง','แป๊ปแบน'];
-// สินค้าที่ต้องวางบนสุด (บาง เสียหายง่าย)
-const TOP_GOODS = ['ซีลาย','แป','มุ้งลวด','แสลน','ฉาก','สแตนเลส','อลูมิเนียม','กระเบื้อง','เมทัลชีท','หลังคา','ตะแกรง'];
+// ─── GOODS CATEGORIES (อัปเดต: แบ่ง 3 ชั้นตามมาตรฐานการวางเหล็ก) ───
+const FLAT_BED_GOODS = [
+  'แป๊ป','เหล็กแผ่น','เหล็กม้วน','เหล็กรูปพรรณ','เหล็กข้ออ้อย','เหล็กเส้น',
+  'เหล็กโครงสร้าง','เหล็กแบน','ท่อเหล็ก','รางน้ำ','ไอบีม','เอชบีม','คานเหล็ก',
+  'h-beam','hbeam','i-beam','ibeam','เหล็กฉาก','เหล็กกล่อง'
+];
+// ชั้นล่างสุด: เหล็กแผ่นหนา, H-Beam, เหล็กฉาก, เหล็กเส้นมัดใหญ่ | ใช้ไม้หมอนรอง วางสลับทิศทาง
+const HEAVY_GOODS = [
+  'เหล็กแผ่น','เหล็กแผ่นหนา','h-beam','hbeam','เอชบีม','ไอบีม','i-beam','ibeam',
+  'เหล็กฉาก','เหล็กเส้น','เหล็กข้ออ้อย','เหล็กม้วน','แป๊ปแบน','แป๊ป',
+  'เหล็กโครงสร้าง','คาน','เหล็กมัด','เหล็กรูปพรรณ'
+];
+// ชั้นกลาง: เหล็กกล่องเหลี่ยม, ท่อเหล็กดำ | ต้องมีไม้คั่น ห้ามของหนักกว่าวางทับ
+const MID_GOODS = [
+  'เหล็กกล่อง','ท่อเหล็กดำ','ท่อดำ','เหล็กกล่องเหลี่ยม','เหล็กปลอก','ปลอกเสา','ปลอกคาน'
+];
+// ชั้นบนสุด: ท่อ GI, ตะแกรงไวร์เมช, เมทัลชีท | ห้ามของหนักกดทับ ป้องกันรอยขีดข่วน
+const TOP_GOODS = [
+  'ท่อ gi','gi','ไวร์เมช','เมทัลชีท','ซีลาย','แป','มุ้งลวด','แสลน',
+  'ฉากยึด','ตะแกรง','หลังคา','อลูมิเนียม','สแตนเลส','กระเบื้อง','ชุบสังกะสี'
+];
+const LAYER_WARNINGS = {
+  bottom:'ใช้ไม้หมอนรองรับน้ำหนัก วางสลับทิศทางให้สมดุล',
+  mid:'ต้องมีไม้คั่นระหว่างชั้น ห้ามของหนักกว่าวางทับ',
+  top:'ห้ามมีวัตถุหนักกดทับ ป้องกันรอยขีดข่วนและการบุบตัว'
+};
 
 let pickupCount = 0;
 let pickupsData = [];
@@ -330,6 +349,7 @@ function goodsPriority(goods) {
   const g = goods.toLowerCase();
   if(TOP_GOODS.some(k=>g.includes(k.toLowerCase()))) return 'top';
   if(HEAVY_GOODS.some(k=>g.includes(k.toLowerCase()))) return 'bottom';
+  if(MID_GOODS.some(k=>g.includes(k.toLowerCase()))) return 'mid';
   return 'mid';
 }
 
@@ -456,9 +476,11 @@ function genStep1() {
   loadingOrder.forEach((item, i) => {
     const badge = item.pri==='bottom'?'bottom':item.pri==='top'?'top':'mid';
     const label = item.pri==='bottom'?'ล่าง':item.pri==='top'?'บน':'กลาง';
+    const warn = LAYER_WARNINGS[item.pri]||'';
     recHtml += `<div class="lo-item">
       <div class="lo-badge ${badge}">${label}</div>
-      <div class="lo-text">${item.name}<br><span class="lo-sub">${item.goods}${item.w>0?' ('+item.w+' ตัน)':''}</span></div>
+      <div class="lo-text">${item.name}<br><span class="lo-sub">${item.goods}${item.w>0?' ('+item.w+' ตัน)':''}</span>${warn?`<br><span class="lo-sub" style="color:var(--accent)">⚠️ ${warn}</span>`:''}
+      </div>
     </div>`;
   });
   recHtml += '</div>';
