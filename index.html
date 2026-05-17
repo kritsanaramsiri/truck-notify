@@ -409,12 +409,10 @@ function genStep1() {
   const loadingOrder = buildLoadingOrder(pickupsData);
   const isFlat = truckType==='flat';
 
-  // Build message
+  // Build message — ใช้ลำดับที่ผู้ใช้กรอกเอง ไม่เรียงอัตโนมัติ
   const lines = [`🚛 แจ้งงานรถ${isFlat?'พื้นเรียบ':'พ่วง'} วันที่ ${date}`, `รับของ ${pickupsData.length} จุด`, ''];
 
-  // Recommended pickup order
-  pickupOrder.forEach((origIdx, i) => {
-    const p = pickupsData[origIdx];
+  pickupsData.forEach((p, i) => {
     lines.push(`${i+1}. ${p.name}`);
     lines.push(`   📦 ${p.goods}`);
     if(isFlat) {
@@ -457,23 +455,26 @@ function genStep1() {
   const out = document.getElementById('step1_out');
   out.innerHTML = '';
 
-  // RECOMMENDATION BOX
+  // RECOMMENDATION BOX — แนะนำเฉยๆ ไม่เปลี่ยนลำดับที่กรอก
   const recBox = document.createElement('div');
   recBox.className = 'rec-box ' + (recType==='flat'?'flat':'trailer');
   let recHtml = `<div class="rec-title">${recType==='flat'?'🚚 แนะนำ: ใช้รถพื้นเรียบ':'🚛 แนะนำ: ใช้รถพ่วงเทรลเลอร์'}</div>`;
 
-  // Pickup order section
-  recHtml += `<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;font-weight:700;letter-spacing:0.5px;">ลำดับรับของที่แนะนำ</div>`;
-  pickupOrder.forEach((origIdx, i) => {
+  // แนะนำลำดับรับ (ไม่บังคับ)
+  recHtml += `<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;font-weight:700;letter-spacing:0.5px;">💡 ลำดับรับที่แนะนำ (ตัดสินใจเองได้)</div>`;
+  const suggestedOrder = buildPickupOrder(pickupsData);
+  suggestedOrder.forEach((origIdx, i) => {
     const p = pickupsData[origIdx];
     const w = isFlat ? p.flatW : (p.mom+p.kid);
-    recHtml += `<div class="rec-row"><span class="rec-label">${i+1}. ${p.name}</span><span class="rec-val">${w>0?w+' ตัน':'-'}</span></div>`;
+    const origNum = parseInt(p.origIndex||origIdx)+1;
+    recHtml += `<div class="rec-row"><span class="rec-label">${i+1}. ${p.name} <span style="color:var(--border);font-size:0.7rem;">(จุดที่ ${origIdx+1} ของคุณ)</span></span><span class="rec-val">${w>0?w+' ตัน':'-'}</span></div>`;
   });
 
-  // Loading order
-  recHtml += `<hr class="rec-divider"><div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;font-weight:700;letter-spacing:0.5px;">ลำดับวางของบนรถ (ล่าง → บน)</div>`;
+  // แนะนำการวางของ
+  recHtml += `<hr class="rec-divider"><div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;font-weight:700;letter-spacing:0.5px;">💡 แนะนำการวางของบนรถ (ล่าง → บน)</div>`;
   recHtml += `<div class="loading-order">`;
-  loadingOrder.forEach((item, i) => {
+  const loadingOrder = buildLoadingOrder(pickupsData);
+  loadingOrder.forEach((item) => {
     const badge = item.pri==='bottom'?'bottom':item.pri==='top'?'top':'mid';
     const label = item.pri==='bottom'?'ล่าง':item.pri==='top'?'บน':'กลาง';
     const warn = LAYER_WARNINGS[item.pri]||'';
