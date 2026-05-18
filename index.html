@@ -405,8 +405,6 @@ function genStep1() {
   pickupsData.forEach(p=>{tMom+=p.mom+p.mmom; tKid+=p.kid+p.mkid; tFlat+=p.flatW+p.mflatW;});
 
   const recType = recommendTruckType(pickupsData);
-  const pickupOrder = buildPickupOrder(pickupsData);
-  const loadingOrder = buildLoadingOrder(pickupsData);
   const isFlat = truckType==='flat';
 
   // Build message — ใช้ลำดับที่ผู้ใช้กรอกเอง ไม่เรียงอัตโนมัติ
